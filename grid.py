@@ -1,6 +1,13 @@
 import random as rand
 import copy as copy
-from shorthand import *
+
+
+UP = (-1, 0)
+DOWN = (1, 0)
+LEFT = (0, -1)
+RIGHT = (0, 1)
+STAY = (0, 0)
+
 
 class Vehicle:
 
