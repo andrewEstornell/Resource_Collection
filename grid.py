@@ -7,6 +7,8 @@ DOWN = (1, 0)
 LEFT = (0, -1)
 RIGHT = (0, 1)
 STAY = (0, 0)
+actions = [UP, DOWN, LEFT, RIGHT, STAY]
+SPAWN = "SPAWN"
 
 
 class Vehicle:
@@ -33,7 +35,7 @@ class Cell:
 
 class Grid:
 
-    def __init__(self, size, seed, max_resources, starting_point, vehicle_capacity, percent_pickup):
+    def __init__(self, size, seed, max_resources, spawning_cost, starting_point, vehicle_capacity, percent_pickup):
         """
 
         :param size: INT, grid will be size*size
@@ -42,9 +44,11 @@ class Grid:
         :param starting_point: TUPLE, location for the first collection point to be placed
         """
         rand.seed(seed)
+        self.vehicle_capacity = vehicle_capacity
         self.total_collection = 0
         self.max_resources = max_resources
         self.size = size
+        self.spawning_cost = spawning_cost
         self.grid = [[Cell(resources=rand.randint(0, max_resources), obstruction=False) for j in range(size)]
                                                                                         for i in range(size)]
         self.percent_pickup = percent_pickup
@@ -56,6 +60,8 @@ class Grid:
                          2: Vehicle((starting_point[0], starting_point[1] + 1), vehicle_capacity, 2),
                          3: Vehicle((starting_point[0] + 1, starting_point[1]), vehicle_capacity, 3),
                          4: Vehicle((starting_point[0], starting_point[1] - 1), vehicle_capacity, 4)}
+        self.drop_offs = {-1: starting_point}
+        self.next_id = 5
         # Adds each vehicle to the vehicle is
         for vehicle in self.vehicles.values():
             self.grid[vehicle.position[0]][vehicle.position[1]].vehicle = vehicle
@@ -79,12 +85,33 @@ class Grid:
         :param action_dict: DICT, contains the action for a given vehicle, keyed by the vehicle id
         :return:
         """
+
         vehicle_ids = self.vehicles.keys()
+        drop_off_ids = self.drop_offs.keys()
         for id, ac in action_dict.items():
             # Validates id of the ship
-            if id not in vehicle_ids:
+            if id in drop_off_ids:
+                if ac == SPAWN:
+                    if self.spawning_cost <= self.total_collection:
+                        self.vehicles[self.next_id] = Vehicle(self.drop_offs[id], self.vehicle_capacity, self.next_id)
+                        self.next_id += 1
+                        self.total_collection -= self.spawning_cost
+                        continue
+                    else:
+                        print("the action SPAWN was given but it cost", self.spawning_cost,
+                              "while the total_collection was only", self.total_collection)
+                        exit(-4)
+            elif id not in vehicle_ids:
                 print("ship", id, "was given action", ac, "but is not in the list of surviving vehicles")
                 exit(-1)
+                # Validates the bounds of the action
+            if ac not in actions:
+                print("vehicle", id, "was given invalid action", ac)
+                exit(-2)
+            if id not in vehicle_ids:
+                print("ship", id, "was given action", ac, "but is not in the list of surviving vehicles")
+                exit(-3)
+
             # Validates the bounds of the action
             vehicle = self.vehicles[id]
             pos = list(vehicle.position)
@@ -118,7 +145,7 @@ class Grid:
             # Collects resources from current square
             resource_gain = int(min(vehicle.capacity, vehicle.cargo + self.grid[vehicle.position[0]][vehicle.position[1]].resources * self.percent_pickup) - vehicle.cargo)
             vehicle.cargo += resource_gain
-            print("id:", vehicle.id, "|| resource gain:", resource_gain, "|| cargo,", vehicle.cargo)
+            #print("id:", vehicle.id, "|| resource gain:", resource_gain, "|| cargo,", vehicle.cargo)
             self.grid[vehicle.position[0]][vehicle.position[1]].resources -= resource_gain
 
             # If current square is a drop off, add cargo to the total collection

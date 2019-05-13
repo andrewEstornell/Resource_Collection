@@ -34,4 +34,3 @@ while True:
 
 print("Game finished with ", grid.total_collection, "score")
 gui.root.mainloop()
-
