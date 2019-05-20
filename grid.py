@@ -13,6 +13,7 @@ SPAWN = "SPAWN"
 
 class Vehicle:
 
+    #add :
     def __init__(self, position, capacity, id):
         self.position = position
         self.id = id
@@ -56,10 +57,12 @@ class Grid:
         # Sets the first drop off point
         self.grid[starting_point[0]][starting_point[1]].is_drop_off_point = True
         # Spawns 4 ships around the drop off point
-        self.vehicles = {1: Vehicle((starting_point[0] - 1, starting_point[1]), vehicle_capacity, 1),
-                         2: Vehicle((starting_point[0], starting_point[1] + 1), vehicle_capacity, 2),
-                         3: Vehicle((starting_point[0] + 1, starting_point[1]), vehicle_capacity, 3),
-                         4: Vehicle((starting_point[0], starting_point[1] - 1), vehicle_capacity, 4)}
+        self.vehicles = {1: Vehicle((starting_point[0] - 1, starting_point[1]), vehicle_capacity, 1)}                
+        """
+         2: Vehicle((starting_point[0], starting_point[1] + 1), vehicle_capacity, 2),
+         3: Vehicle((starting_point[0] + 1, starting_point[1]), vehicle_capacity, 3),
+         4: Vehicle((starting_point[0], starting_point[1] - 1), vehicle_capacity, 4)}
+        """
         self.drop_offs = {-1: starting_point}
         self.next_id = 5
         # Adds each vehicle to the vehicle is
@@ -85,36 +88,44 @@ class Grid:
         :param action_dict: DICT, contains the action for a given vehicle, keyed by the vehicle id
         :return:
         """
-
+        #returns an iterator of the vehicle keys
         vehicle_ids = self.vehicles.keys()
-        drop_off_ids = self.drop_offs.keys()
+        
+        drop_off_ids = self.drop_offs.keys()#not sure
+
+        #id is the key and the action (tuple)
         for id, ac in action_dict.items():
+        
             # Validates id of the ship
             if id in drop_off_ids:
-                if ac == SPAWN:
-                    if self.spawning_cost <= self.total_collection:
-                        self.vehicles[self.next_id] = Vehicle(self.drop_offs[id], self.vehicle_capacity, self.next_id)
+                if ac == SPAWN: #if one of the actions is to spawn a new ship
+                    if self.spawning_cost <= self.total_collection: #if the ships collected enough resources to spawn a new vehicle
+                        #add to the dictionary of vehicles a new ship and spawn it at drop_off
+                        self.vehicles[self.next_id] = Vehicle(self.drop_offs[id], self.vehicle_capacity, self.next_id) 
                         self.next_id += 1
-                        self.total_collection -= self.spawning_cost
+                        self.total_collection -= self.spawning_cost #deduct from the total_collection the spawning cost since it has been used to spawn new ship
                         continue
-                    else:
+                    else:#not enough resources to spawn the new ship
                         print("the action SPAWN was given but it cost", self.spawning_cost,
                               "while the total_collection was only", self.total_collection)
                         exit(-4)
-            elif id not in vehicle_ids:
+                        
+            elif id not in vehicle_ids: #a vehicle was given an action to perform but was not actually in the remaining vehicles
                 print("ship", id, "was given action", ac, "but is not in the list of surviving vehicles")
                 exit(-1)
-                # Validates the bounds of the action
-            if ac not in actions:
+                
+            # Validates the bounds of the action
+            if ac not in actions: #if the action is not one of the valid UP DOWN RIGHT LEFT STAY
                 print("vehicle", id, "was given invalid action", ac)
                 exit(-2)
-            if id not in vehicle_ids:
+                
+            if id not in vehicle_ids: #an additional check that the vehicle id in action_dict is still alive
                 print("ship", id, "was given action", ac, "but is not in the list of surviving vehicles")
                 exit(-3)
 
-            # Validates the bounds of the action
-            vehicle = self.vehicles[id]
-            pos = list(vehicle.position)
+            # Validates the bounds of the action. Makes sure ship doesn't go off the board
+            vehicle = self.vehicles[id] #vehicle object
+            pos = list(vehicle.position) #converts the vehicle position tuple to a list
             if pos[0] + ac[0] >= self.size or pos[1] + ac[1] >= self.size or pos[0] + ac[0] < 0 or pos[1] + ac[1] < 0:
                 print("vehicle", id, "was given action", ac, "but pushed it off the edge of the board")
 
@@ -134,7 +145,7 @@ class Grid:
                 del self.vehicles[vehicle1.id]
                 continue
             for vehicle2 in vehicles:
-                if vehicle1.position == vehicle2.position and vehicle1.id != vehicle2.id:
+                if vehicle1.position == vehicle2.position and vehicle1.id != vehicle2.id: #if they are on same square but not the same ship
                     if vehicle1.id in self.vehicles.keys():
                         del self.vehicles[vehicle1.id]
                     if vehicle2.id in self.vehicles.keys():
@@ -154,7 +165,3 @@ class Grid:
                 vehicle.cargo = 0
 
             self.grid[vehicle.position[0]][vehicle.position[1]].vehicle = vehicle
-
-
-
-
