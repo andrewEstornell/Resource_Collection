@@ -50,12 +50,15 @@ class Grid:
         self.max_resources = max_resources
         self.size = size
         self.spawning_cost = spawning_cost
+
         self.grid = [[Cell(resources=rand.randint(0, max_resources), obstruction=False) for j in range(size)]
                                                                                         for i in range(size)]
+
         self.percent_pickup = percent_pickup
         self.starting_point = starting_point
         # Sets the first drop off point
         self.grid[starting_point[0]][starting_point[1]].is_drop_off_point = True
+        self.grid[starting_point[0]][starting_point[1]].resources = 0
         # Spawns 4 ships around the drop off point
         self.vehicles = {1: Vehicle((starting_point[0] - 1, starting_point[1]), vehicle_capacity, 1)}                
         """

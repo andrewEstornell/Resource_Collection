@@ -2,7 +2,7 @@ from gui import *
 from grid import *
 from greedy import greedy_decision, random_decision
 
-size = 51 
+size = 50
 seed = 10
 spawning_cost = 10000
 max_resources = 400
