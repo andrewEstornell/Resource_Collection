@@ -75,11 +75,5 @@ def greedy_move(grid, vehicle):
         return RIGHT
     else: #if stay is the cell with max resources
         return STAY
-    
-def random_decision(grid, action_dict):
-    #returns 100 tuples that can randomly be one of the move options
-    actions = rand.choices([UP, DOWN, LEFT, RIGHT, STAY], k=100)
 
-    #iterate through the vehicles and assign a random move to each
-    for i in list(grid.vehicles.keys()):
-        action_dict[i] = actions[i - 1]
+

@@ -1,6 +1,6 @@
 from gui import *
 from grid import *
-from greedy import greedy_decision, random_decision
+from greedy import greedy_decision
 
 size = 50
 seed = 10
@@ -28,8 +28,10 @@ if __name__=='__main__':
             action_dict[-1] = SPAWN
             
         
-        print(it, len(list(grid.vehicles.keys()))) #prints the number of vehicles
-
+        print("iteration:",it)
+        for id in grid.vehicles.keys():
+            print("Vehicle", id, "contains", grid.vehicles[id].cargo, "resources")
+    
         #action_dict is a dictionary with vehicle number: random move
         grid.perform_actions(action_dict)
         gui.update()
