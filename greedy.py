@@ -7,11 +7,17 @@ RIGHT = (0, 1)
 STAY = (0, 0)
 
 dead_blocks = []
-
 radius = 1/5
 
 #the function that makes the greedy decision
 def greedy_decision(grid, action_dict):
+    #defining the centers of each quadrant should the ship need to move towards one in the case of scarce resources
+    n = grid.size//4
+    quad_1 = (n, n)
+    quad_2 = (n, n*3)
+    quad_3 = (n*3, n*3)
+    quad_4 = (n*3, n)
+    
     move_to_make = 0
     for vehicle in grid.vehicles.values():
 
@@ -30,8 +36,32 @@ def greedy_decision(grid, action_dict):
         #else continue collecting resources
         else:    
             move = greedy_move(grid, vehicle)
-            if grid.grid[move[0]][move[1]].resources == 0:#if all surounding blocks are 0, arbitrarily move left
-                move = LEFT
+
+            #if all blocks in surounding radius are 0, move towards the quadrant with most resources
+            if grid.grid[move[0]][move[1]].resources == 0:
+                best_quadrant = find_best_quadrant(grid) #finds quadrant with most resources
+                pos_of_best_quadrant = 0
+                if best_quadrant == 1:
+                    pos_of_best_quadrant = quad_1
+                elif best_quadrant == 2:
+                    pos_of_best_quadrant = quad_2
+                elif best_quadrant == 3:
+                    pos_of_best_quadrant = quad_3
+                else:
+                    pos_of_best_quadrant = quad_4
+
+                #after we have found best quadrant, move towards it
+                if vehicle.position[0] < pos_of_best_quadrant[0]: #go down
+                    move_to_make = DOWN
+                elif vehicle.position[0] > pos_of_best_quadrant[0]: #go up
+                    move_to_make = UP
+                elif vehicle.position[1] < pos_of_best_quadrant[1]: #go right
+                    move_to_make = RIGHT
+                elif vehicle.position[1] > pos_of_best_quadrant[1]: #go left
+                    move_to_make = LEFT
+                else:
+                    print("Vehicle is on best quadrant")
+                    
             move_to_make = move
 
         #a check to make sure the move does not result in a crash
