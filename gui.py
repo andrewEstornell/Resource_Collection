@@ -60,7 +60,7 @@ class GUI:
                 self.rectangles[id] = rec
 
         vehicle_ids = list(self.grid.vehicles.keys())
-        time.sleep(.3)
+        time.sleep(.1)
         for id in list(self.rectangles.keys()):
             if id not in vehicle_ids:
                 print("vehicle", id, "crashed")

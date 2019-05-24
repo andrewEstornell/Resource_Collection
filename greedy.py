@@ -5,7 +5,10 @@ DOWN = (1, 0)
 LEFT = (0, -1)
 RIGHT = (0, 1)
 STAY = (0, 0)
-radius = 1/10
+
+dead_blocks = []
+
+radius = 1/5
 
 #the function that makes the greedy decision
 def greedy_decision(grid, action_dict):
@@ -26,12 +29,30 @@ def greedy_decision(grid, action_dict):
                 print("Vehicle is on starting point")
         #else continue collecting resources
         else:    
-            pos = greedy_move(grid, vehicle)
-            if grid.grid[pos[0]][pos[1]].resources == 0:#if all surounding blocks are 0, arbitrarily move left
-                pos = LEFT
-            move_to_make = pos
-        action_dict[vehicle.id] = move_to_make
+            move = greedy_move(grid, vehicle)
+            if grid.grid[move[0]][move[1]].resources == 0:#if all surounding blocks are 0, arbitrarily move left
+                move = LEFT
+            move_to_make = move
 
+        #a check to make sure the move does not result in a crash
+        potential_block = (vehicle.position[0] + move_to_make[0], vehicle.position[1]+move_to_make[1])
+        if potential_block in dead_blocks:
+            if (vehicle.position[0] + UP[0], vehicle.position[1] + UP[1]) not in dead_blocks:
+                move_to_make = UP
+            elif (vehicle.position[0] + DOWN[0], vehicle.position[1] + DOWN[1]) not in dead_blocks:
+                move_to_make = DOWN
+            elif (vehicle.position[0] + LEFT[0], vehicle.position[1] + LEFt[1]) not in dead_blocks:
+                move_to_make = LEFT
+            elif (vehicle.position[0] + RIGHT[0], vehicle.position[1] + RIGHT[1]) not in dead_blocks:
+                move_to_make = RIGHT
+            else:
+                move_to_make = STAY
+            potential_block = (vehicle.position[0] + move_to_make[0], vehicle.position[1]+move_to_make[1])
+            
+        action_dict[vehicle.id] = move_to_make
+        dead_blocks.append(potential_block) 
+        
+    dead_blocks.clear()
         
 #finds the best position of the cell immediately surrounding the block with the greatest resource        
 def greedy_move(grid, vehicle):
@@ -56,9 +77,10 @@ def greedy_move(grid, vehicle):
 
     move_to_ret = 0
 
-    #figure out direction of the best move and move towards it
+    #figure out direction of the best move and move towards it greedily
     i = best_move[0]
     j = best_move[1]
+    
     if pos[0] > i and pos[1] < j: #up and to the right
         move_to_ret = find_best_neighbor(UP, RIGHT, pos, grid)
     elif pos[0] < i and pos[1] < j: #down and to the right
@@ -77,13 +99,14 @@ def greedy_move(grid, vehicle):
         move_to_ret = RIGHT
     else:            #stay
         move_to_ret = STAY
-
+    
     return move_to_ret
 
 #makes sure potential coordinates are in bound
 def in_bound(i, j, size):
     return i >= 0 and j >= 0 and i < size and j < size
 
+#finds the neighbor with the most resources
 def find_best_neighbor(move1, move2, pos, grid):
     pos_1 = (pos[0] + move1[0], pos[1] + move1[1]) #position on the grid of the first possible move
     pos_2 = (pos[0] + move2[0], pos[1] + move2[1]) #position on the grid of the second possible move
