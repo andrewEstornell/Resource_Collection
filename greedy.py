@@ -5,6 +5,7 @@ DOWN = (1, 0)
 LEFT = (0, -1)
 RIGHT = (0, 1)
 STAY = (0, 0)
+radius = 1/10
 
 #the function that makes the greedy decision
 def greedy_decision(grid, action_dict):
@@ -58,6 +59,49 @@ def find_best_quadrant(grid):
         
 #finds the best position of the cell immediately surrounding the block with the greatest resource        
 def greedy_move(grid, vehicle):
+    pos = vehicle.position
+    #scan some radius of the board and create a move vector
+    move_vector = {}
+    n = int(radius*.5*grid.size)
+    for i in range(pos[0]-n, pos[0]+(n+1)):
+        for j in range(pos[1]-n, pos[1]+(n+1)):
+            if in_bound(i, j, grid.size):
+                distance = abs(i-pos[0]) + abs(j-pos[1])
+                if distance == 0:
+                    distance = 1
+                move_vector[(i, j)] = grid.grid[i][j].resources/(distance**2)
+    #find the max of the move vector from that find the bext move 
+    max_resource = max(move_vector.values())
+    best_move = 0
+    for move in move_vector:
+        if max_resource == move_vector[move]:
+            best_move = move
+            break
+
+    print("current position:", pos)
+    print("current best move:", best_move)
+    move_to_ret = 0
+    
+    i = best_move[0]
+    j = best_move[1]
+    if pos[0] > i and pos[1] < j: #up and to the right
+
+    elif pos[0] < i and pos[1] < j: #down and to the right
+
+    elif pos[0] > i and pos[1] > j: #up and to the left
+
+    elif pos[0] < i and pos[1] > j: #down and to the left
+
+    elif pos[0] > i: #up
+        move_to_ret = UP
+    elif pos[0] < i: #down
+        move_to_ret = DOWN
+    elif pos[1] > j: #left
+        move_to_ret = LEFT
+    elif pos[1] < j: #right
+        move_to_ret = RIGHT
+    else:            #stay
+        move_to_ret = STAY
     up = (vehicle.position[0]-1, vehicle.position[1])
     down = (vehicle.position[0]+1, vehicle.position[1])
     left = (vehicle.position[0], vehicle.position[1]-1)
@@ -77,3 +121,5 @@ def greedy_move(grid, vehicle):
         return STAY
 
 
+def in_bound(i, j, size):
+    return i >= 0 and j >= 0 and i < size and j < size
