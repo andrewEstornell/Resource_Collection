@@ -39,6 +39,8 @@ if __name__=='__main__':
         #if there are no more vehicles in the game
         if len(list(grid.vehicles.keys())) == 0:
             break
+        if grid.total_resources == 0:
+            break
 
     print("Game finished with ", grid.total_collection, "score")
     gui.root.mainloop()

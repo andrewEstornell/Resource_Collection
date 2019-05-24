@@ -64,8 +64,12 @@ class Grid:
                          2: Vehicle((starting_point[0], starting_point[1] + 1), vehicle_capacity, 2),
                          3: Vehicle((starting_point[0] + 1, starting_point[1]), vehicle_capacity, 3),
                          4: Vehicle((starting_point[0], starting_point[1] - 1), vehicle_capacity, 4)}
-
-        #self.total_resources = 
+        
+        s = 0
+        for i in range(size):
+            for j in range(size):
+                s += self.grid[i][j].resources
+        self.total_resources = s
         self.drop_offs = {-1: starting_point}
         self.next_id = 5
         # Adds each vehicle to the vehicle is
@@ -161,7 +165,8 @@ class Grid:
             vehicle.cargo += resource_gain
             #print("id:", vehicle.id, "|| resource gain:", resource_gain, "|| cargo,", vehicle.cargo)
             self.grid[vehicle.position[0]][vehicle.position[1]].resources -= resource_gain
-
+            self.total_resources -= resource_gain
+            
             # If current square is a drop off, add cargo to the total collection
             if self.grid[vehicle.position[0]][vehicle.position[1]].is_drop_off_point:
                 self.total_collection += vehicle.cargo
