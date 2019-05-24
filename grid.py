@@ -60,12 +60,12 @@ class Grid:
         self.grid[starting_point[0]][starting_point[1]].is_drop_off_point = True
         self.grid[starting_point[0]][starting_point[1]].resources = 0
         # Spawns 4 ships around the drop off point
-        self.vehicles = {1: Vehicle((starting_point[0] - 1, starting_point[1]), vehicle_capacity, 1)}                
-        """
-         2: Vehicle((starting_point[0], starting_point[1] + 1), vehicle_capacity, 2),
-         3: Vehicle((starting_point[0] + 1, starting_point[1]), vehicle_capacity, 3),
-         4: Vehicle((starting_point[0], starting_point[1] - 1), vehicle_capacity, 4)}
-        """
+        self.vehicles = {1: Vehicle((starting_point[0] - 1, starting_point[1]), vehicle_capacity, 1),              
+                         2: Vehicle((starting_point[0], starting_point[1] + 1), vehicle_capacity, 2),
+                         3: Vehicle((starting_point[0] + 1, starting_point[1]), vehicle_capacity, 3),
+                         4: Vehicle((starting_point[0], starting_point[1] - 1), vehicle_capacity, 4)}
+
+        #self.total_resources = 
         self.drop_offs = {-1: starting_point}
         self.next_id = 5
         # Adds each vehicle to the vehicle is

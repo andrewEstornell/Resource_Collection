@@ -9,14 +9,9 @@ STAY = (0, 0)
 dead_blocks = []
 radius = 1/5
 
+
 #the function that makes the greedy decision
 def greedy_decision(grid, action_dict):
-    #defining the centers of each quadrant should the ship need to move towards one in the case of scarce resources
-    n = grid.size//4
-    quad_1 = (n, n)
-    quad_2 = (n, n*3)
-    quad_3 = (n*3, n*3)
-    quad_4 = (n*3, n)
     
     move_to_make = 0
     for vehicle in grid.vehicles.values():
@@ -37,30 +32,10 @@ def greedy_decision(grid, action_dict):
         else:    
             move = greedy_move(grid, vehicle)
 
-            #if all blocks in surounding radius are 0, move towards the quadrant with most resources
+            #if all blocks in surounding radius are 0, expand the radius that the greedy searches
             if grid.grid[move[0]][move[1]].resources == 0:
-                best_quadrant = find_best_quadrant(grid) #finds quadrant with most resources
-                pos_of_best_quadrant = 0
-                if best_quadrant == 1:
-                    pos_of_best_quadrant = quad_1
-                elif best_quadrant == 2:
-                    pos_of_best_quadrant = quad_2
-                elif best_quadrant == 3:
-                    pos_of_best_quadrant = quad_3
-                else:
-                    pos_of_best_quadrant = quad_4
-
-                #after we have found best quadrant, move towards it
-                if vehicle.position[0] < pos_of_best_quadrant[0]: #go down
-                    move_to_make = DOWN
-                elif vehicle.position[0] > pos_of_best_quadrant[0]: #go up
-                    move_to_make = UP
-                elif vehicle.position[1] < pos_of_best_quadrant[1]: #go right
-                    move_to_make = RIGHT
-                elif vehicle.position[1] > pos_of_best_quadrant[1]: #go left
-                    move_to_make = LEFT
-                else:
-                    print("Vehicle is on best quadrant")
+                global radius
+                radius = min(radius*2, 1)
                     
             move_to_make = move
 
@@ -71,7 +46,7 @@ def greedy_decision(grid, action_dict):
                 move_to_make = UP
             elif (vehicle.position[0] + DOWN[0], vehicle.position[1] + DOWN[1]) not in dead_blocks:
                 move_to_make = DOWN
-            elif (vehicle.position[0] + LEFT[0], vehicle.position[1] + LEFt[1]) not in dead_blocks:
+            elif (vehicle.position[0] + LEFT[0], vehicle.position[1] + LEFT[1]) not in dead_blocks:
                 move_to_make = LEFT
             elif (vehicle.position[0] + RIGHT[0], vehicle.position[1] + RIGHT[1]) not in dead_blocks:
                 move_to_make = RIGHT
@@ -145,27 +120,3 @@ def find_best_neighbor(move1, move2, pos, grid):
         return move1
     else:
         return move2
-
-#if the blocks in the radius surounding the ship are all 0, and the ship is on a 0 block, then the ship should move towards the quadrant of the cell with the greatest resources
-def find_best_quadrant(grid):
-    half = grid.size//2
-    quadrant_resources = {}
-    quadrant_resources[1] = 0
-    quadrant_resources[2] = 0
-    quadrant_resources[3] = 0
-    quadrant_resources[4] = 0
-    for i in range(grid.size):
-        for j in range(grid.size):
-            res = grid.grid[i][j].resources
-            if i < half and j < half:
-                quadrant_resources[1] += res
-            elif i < half:
-                quadrant_resources[2] += res
-            elif j < half:
-                quadrant_resources[3] += res
-            else:
-                quadrant_resources[4] += res
-    max_res = max(quadrant_resources.values())
-    for i in quadrant_resources.keys():
-        if quadrant_resources[i] == max_res:
-            return i

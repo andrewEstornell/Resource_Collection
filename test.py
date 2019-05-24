@@ -1,5 +1,9 @@
-import time as time
-import random as rand
+a = 5
 
-print(hex(4095))
-print(format(10000, "03x"))
+def f():
+    global a
+    a -= 1
+
+print(a)
+f()
+print(a)

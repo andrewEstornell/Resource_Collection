@@ -4,7 +4,7 @@ from greedy import greedy_decision
 
 size = 50
 seed = 10
-spawning_cost = 10000
+spawning_cost = 2000
 max_resources = 400
 starting_point = ((size-1)//2, (size-1)//2)
 vehicle_capacity = 10000
@@ -29,8 +29,8 @@ if __name__=='__main__':
             
         
         print("iteration:",it)
-        for id in grid.vehicles.keys():
-            print("Vehicle", id, "contains", grid.vehicles[id].cargo, "resources")
+        #for id in grid.vehicles.keys():
+        #    print("Vehicle", id, "contains", grid.vehicles[id].cargo, "resources")
     
         #action_dict is a dictionary with vehicle number: random move
         grid.perform_actions(action_dict)
