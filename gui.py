@@ -13,6 +13,7 @@ class GUI:
         self.main_canvas = Canvas(self.root, width=self.size, height=self.size)
         self.rectangles = {}
         self.grid_rectangles = []
+        self.demo_ship_recs = {}
 
         self.main_canvas.delete('grid_line')  # Will only remove the grid_line
 
@@ -34,12 +35,12 @@ class GUI:
                 rec = self.main_canvas.create_rectangle(i*self.scale, j*self.scale, (i + 1)*self.scale, (j + 1)*self.scale,
                                                         fill='#' + format(scale + 1000, '03x') + format(scale + 100, '03x') + format(scale + 1000, '03x'))
                 row.append(rec)
-                if self.grid.grid[i][j].vehicle is not None:
-                    vehicle = grid.grid[i][j].vehicle
-                    rec = self.main_canvas.create_rectangle(vehicle.position[0]*self.scale, vehicle.position[1]*self.scale,
-                                                            (vehicle.position[0] + 1)*self.scale, (vehicle.position[1] + 1)*self.scale,
+                if self.grid.grid[i][j].ship is not None:
+                    ship = grid.grid[i][j].ship
+                    rec = self.main_canvas.create_rectangle(ship.position[0]*self.scale, ship.position[1]*self.scale,
+                                                            (ship.position[0] + 1)*self.scale, (ship.position[1] + 1)*self.scale,
                                                             fill="#111ddd111")
-                    self.rectangles[vehicle.id] = rec
+                    self.rectangles[ship.id] = rec
 
                 elif self.grid.grid[i][j].is_drop_off_point:
                     self.main_canvas.create_rectangle(i*self.scale, j*self.scale, (i + 1)*self.scale, (j + 1)*self.scale,
@@ -49,21 +50,21 @@ class GUI:
                                                  font="Times 40 italic bold", text="Score : 0")
 
     def update(self):
-        vehicle_ids = list(self.grid.vehicles.keys())
-        for id in vehicle_ids:
+        ship_ids = list(self.grid.ships.keys())
+        for id in ship_ids:
            if id not in self.rectangles.keys():
-                rec = self.main_canvas.create_rectangle(self.grid.vehicles[id].position[0] * self.scale,
-                                                        self.grid.vehicles[id].position[1] * self.scale,
-                                                        (self.grid.vehicles[id].position[0] + 1) * self.scale,
-                                                        (self.grid.vehicles[id].position[1] + 1) * self.scale,
+                rec = self.main_canvas.create_rectangle(self.grid.ships[id].position[0] * self.scale,
+                                                        self.grid.ships[id].position[1] * self.scale,
+                                                        (self.grid.ships[id].position[0] + 1) * self.scale,
+                                                        (self.grid.ships[id].position[1] + 1) * self.scale,
                                                         fill="#111ddd111")
                 self.rectangles[id] = rec
 
-        vehicle_ids = list(self.grid.vehicles.keys())
+        ship_ids = list(self.grid.ships.keys())
         time.sleep(.1)
         for id in list(self.rectangles.keys()):
-            if id not in vehicle_ids:
-                print("vehicle", id, "crashed")
+            if id not in ship_ids:
+                print("ship", id, "crashed")
                 self.main_canvas.delete(self.rectangles[id])
                 #self.main_canvas.pack()
                 #self.root.update()
@@ -72,9 +73,9 @@ class GUI:
 
 
             self.main_canvas.tag_raise(self.rectangles[id])
-            if self.grid.vehicles[id].last_action is not None:
-                self.main_canvas.move(self.rectangles[id],self.grid.vehicles[id].last_action[0]*self.scale,
-                                      self.grid.vehicles[id].last_action[1]*self.scale)
+            if self.grid.ships[id].last_action is not None:
+                self.main_canvas.move(self.rectangles[id],self.grid.ships[id].last_action[0]*self.scale,
+                                      self.grid.ships[id].last_action[1]*self.scale)
             self.main_canvas.pack()
             self.root.update()
 
@@ -89,6 +90,19 @@ class GUI:
                                                fill='#' + format(scale + 1000, '03x') + format(scale + 100, '03x') + format(scale + 1000, '03x'))
             #print("")
         self.main_canvas.itemconfigure(self.info, text="Score : " + str(self.grid.total_collection))
+        for id in self.grid.demo_ships.keys():
+            if id not in self.demo_ship_recs.keys():
+                rec = self.main_canvas.create_rectangle(self.grid.demo_ships[id].position[0] * self.scale,
+                                                        self.grid.demo_ships[id].position[1] * self.scale,
+                                                        (self.grid.demo_ships[id].position[0] + 1) * self.scale,
+                                                        (self.grid.demo_ships[id].position[1] + 1) * self.scale,
+                                                        fill="#fff000000")
+                self.demo_ship_recs[id] = rec
+            last_ac = self.grid.demo_ships[id].last_action
+            if last_ac is not None and self.grid.iteration % self.grid.demo_ship_turn == 0:
+                self.main_canvas.move(self.demo_ship_recs[id], self.grid.demo_ships[id].last_action[0]*self.scale,
+                                      self.grid.demo_ships[id].last_action[1]*self.scale)
+
         self.main_canvas.pack()
         self.root.update()
 

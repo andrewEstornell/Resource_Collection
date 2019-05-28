@@ -1,9 +1,3 @@
-a = 5
+import random as rand
 
-def f():
-    global a
-    a -= 1
-
-print(a)
-f()
-print(a)
+print(int(rand.uniform(0, 1) > 0.5))
