@@ -4,7 +4,7 @@ from greedy import greedy_decision
 
 MAX_ITERATIONS = 500
 
-size = 25
+size = 10
 seed = 25
 spawning_cost = 2000
 max_resources = 400

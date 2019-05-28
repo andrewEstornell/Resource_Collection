@@ -256,6 +256,11 @@ class Grid:
 
             self.grid[ship.position[0]][ship.position[1]].ship = ship
 
+        if self.total_resources == 0:
+            print("Game Over. No more Resources")
+            print("Score: ", self.total_collection)
+            exit(1)
+
         # Performs demo ship actions on even rounds
         if self.iteration % demo_ship_spawn_rate == 0 and self.iteration != 0:
             self.demo_ships[self.next_id] = DemoShip([1, 1])
@@ -271,12 +276,11 @@ class Grid:
             for demo_ship in self.demo_ships.values():
                 s = demo_ship.move(list(self.ships.values()))
                 if s is not None:
-                    print(s)
                     del self.ships[s.id]
                 if len(list(self.ships.values())) == 0:
-                    print("game over")
+                    print("Game Over. Demo ship destroyed last cargo ship")
                     print("Score: ", self.total_collection)
                     exit(1)
-
+        print(self.total_resources)
         self.iteration += 1
 

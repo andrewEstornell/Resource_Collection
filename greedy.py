@@ -15,6 +15,7 @@ def greedy_decision(grid, action_dict, it):
 	or it makes a move using the greed_move function. It then validates that the move will not result in a crash. If it does it finds a move that will not
 	result in a crash
 	"""
+	it -= 1
 	move_to_make = 0
 	for ship in grid.ships.values():
 
@@ -43,12 +44,8 @@ def greedy_decision(grid, action_dict, it):
 			move_to_make = move
 
 		#adds places where ship would be within 1 move of demo ship to dead blocks
-		if it%grid.demo_ship_turn == 0:
-			demo_dead_blocks = add_demo_dead_blocks(dead_blocks, ship, grid)
-		else:
-			#demo_dead_blocks = avoid_demo(dead_blocks, ship, grid)
-			demo_dead_blocks = add_demo_dead_blocks(dead_blocks, ship, grid)
-
+		demo_dead_blocks = add_demo_dead_blocks(dead_blocks, ship, grid)
+		#adds places where ship would go off edge to dead blocks
 		off_edge_dead_blocks = off_edge(dead_blocks, ship, grid)
 		# a check to make sure the move does not result in a crash
 		potential_block = (ship.position[0] + move_to_make[0], ship.position[1] + move_to_make[1])
@@ -67,14 +64,14 @@ def greedy_decision(grid, action_dict, it):
 				move_to_make = make_random_move(p3, p4, p1, p2, LEFT, RIGHT, UP, DOWN, dead_blocks)
 			else:
 				move_to_make = make_random_move(p4, p1, p2, p3, RIGHT, UP, DOWN, LEFT, dead_blocks)
-			potential_block = (ship.position[0] + move_to_make[0], ship.position[1] + move_to_make[1])
+			decided_block = (ship.position[0] + move_to_make[0], ship.position[1] + move_to_make[1])
 
 		#the last demo_dead_blocks that were added to this list only apply to an individual ship
 		for i in range(demo_dead_blocks + off_edge_dead_blocks):
 			del(dead_blocks[-1])
 
 		action_dict[ship.id] = move_to_make
-		dead_blocks.append(potential_block)
+		dead_blocks.append(decided_block)
 
 	dead_blocks.clear()
 
