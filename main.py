@@ -27,8 +27,8 @@ if __name__ == '__main__':
 		greedy_decision(grid, action_dict, it)
 
 		# if the total resources collected are greater than the cost, add a spawn action
-		#if grid.total_collection >= grid.spawning_cost:
-		#	action_dict[-1] = SPAWN
+		if grid.total_collection >= grid.spawning_cost:
+			action_dict[-1] = SPAWN
 
 		print("iteration:", it)
 

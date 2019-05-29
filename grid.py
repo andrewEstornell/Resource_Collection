@@ -144,8 +144,8 @@ class Grid:
                       3: Ship((starting_point[0] + 1, starting_point[1]), ship_capacity, 3),
                       4: Ship((starting_point[0], starting_point[1] - 1), ship_capacity, 4)}
 
-        self.demo_ships = {5: DemoShip([1, 1]), 6: DemoShip([self.size - 2, 1])}
-                           #7: DemoShip([1, self.size - 2]), 8: DemoShip([self.size - 2, self.size - 2])}
+        self.demo_ships = {5: DemoShip([1, 1]), 6: DemoShip([self.size - 2, 1]),
+                           7: DemoShip([1, self.size - 2]), 8: DemoShip([self.size - 2, self.size - 2])}
         
         s = 0
         for i in range(size):
@@ -190,7 +190,7 @@ class Grid:
                 if ac == SPAWN: #if one of the actions is to spawn a new ship
                     if self.spawning_cost <= self.total_collection: #if the ships collected enough resources to spawn a new ship
                         #add to the dictionary of ships a new ship and spawn it at drop_off
-                        self.ships[self.next_id] = ship(self.drop_offs[id], self.ship_capacity, self.next_id) 
+                        self.ships[self.next_id] = Ship(self.drop_offs[id], self.ship_capacity, self.next_id)
                         self.next_id += 1
                         self.total_collection -= self.spawning_cost #deduct from the total_collection the spawning cost since it has been used to spawn new ship
                         continue
@@ -281,6 +281,5 @@ class Grid:
                     print("Game Over. Demo ship destroyed last cargo ship")
                     print("Score: ", self.total_collection)
                     exit(1)
-        print(self.total_resources)
         self.iteration += 1
 

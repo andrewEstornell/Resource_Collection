@@ -40,7 +40,7 @@ def greedy_decision(grid, action_dict, it):
 			# if all blocks in surounding radius are 0, expand the radius that the greedy searches
 			if grid.grid[move[0]][move[1]].resources == 0:
 				global radius
-				radius = min(radius * 2, 1)
+				radius = min(radius * 2, 2)
 			move_to_make = move
 
 		#adds places where ship would be within 1 move of demo ship to dead blocks
@@ -64,14 +64,14 @@ def greedy_decision(grid, action_dict, it):
 				move_to_make = make_random_move(p3, p4, p1, p2, LEFT, RIGHT, UP, DOWN, dead_blocks)
 			else:
 				move_to_make = make_random_move(p4, p1, p2, p3, RIGHT, UP, DOWN, LEFT, dead_blocks)
-			decided_block = (ship.position[0] + move_to_make[0], ship.position[1] + move_to_make[1])
+			potential_block = (ship.position[0] + move_to_make[0], ship.position[1] + move_to_make[1])
 
 		#the last demo_dead_blocks that were added to this list only apply to an individual ship
 		for i in range(demo_dead_blocks + off_edge_dead_blocks):
 			del(dead_blocks[-1])
 
 		action_dict[ship.id] = move_to_make
-		dead_blocks.append(decided_block)
+		dead_blocks.append(potential_block)
 
 	dead_blocks.clear()
 
