@@ -23,16 +23,29 @@ def greedy_decision(grid, action_dict, it):
 
 		# if the ship has no space left and needs to drop off cargo
 		if ship.cargo == ship.capacity:
-			if ship.position[0] < grid.starting_point[0]:  # go down
-				move_to_make = DOWN
-			elif ship.position[0] > grid.starting_point[0]:  # go up
-				move_to_make = UP
-			elif ship.position[1] < grid.starting_point[1]:  # go right
-				move_to_make = RIGHT
-			elif ship.position[1] > grid.starting_point[1]:  # go left
-				move_to_make = LEFT
+			r = rand.random()
+			if r < .5:
+				if ship.position[0] < grid.starting_point[0]:  # go down
+					move_to_make = DOWN
+				elif ship.position[0] > grid.starting_point[0]:  # go up
+					move_to_make = UP
+				elif ship.position[1] < grid.starting_point[1]:  # go right
+					move_to_make = RIGHT
+				elif ship.position[1] > grid.starting_point[1]:  # go left
+					move_to_make = LEFT
+				else:
+					print("ship is on starting point")
 			else:
-				print("ship is on starting point")
+				if ship.position[1] < grid.starting_point[1]:  # go right
+					move_to_make = RIGHT
+				elif ship.position[1] > grid.starting_point[1]:  # go left
+					move_to_make = LEFT
+				elif ship.position[0] < grid.starting_point[0]:  # go down
+					move_to_make = DOWN
+				elif ship.position[0] > grid.starting_point[0]:  # go up
+					move_to_make = UP
+				else:
+					print("ship is on starting point")
 		# else continue collecting resources
 		else:
 			move = greedy_move(grid, ship)
