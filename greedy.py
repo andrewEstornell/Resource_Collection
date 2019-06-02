@@ -54,6 +54,7 @@ def greedy_decision(grid, action_dict, it):
 			if grid.grid[ship.position[0] + move[0]][ship.position[1] + move[1]].resources == 0:
 				global radius
 				radius = min(radius * 2, 2)
+				move = greedy_move(grid, ship)
 			move_to_make = move
 
 		#adds places where ship would be within 1 move of demo ship to dead blocks
@@ -87,36 +88,6 @@ def greedy_decision(grid, action_dict, it):
 		dead_blocks.append(potential_block)
 
 	dead_blocks.clear()
-
-def avoid_demo(db, ship, grid):
-	"""
-	:param db: LIST dead blocks
-	:param ship: SHIP
-	:param grid: GRID
-	:return: INT, number of avoided demo ships
-	avoid demo ships on turns where they do not move
-	"""
-	to_ret = 0
-	up = (ship.position[0] + UP[0], ship.position[1] + UP[1])
-	down = (ship.position[0] + DOWN[0], ship.position[1] + DOWN[1])
-	left = (ship.position[0] + LEFT[0], ship.position[1] + LEFT[1])
-	right = (ship.position[0] + RIGHT[0], ship.position[1] + RIGHT[1])
-	demo_ship_blocks = []
-	for demo_ship in grid.demo_ships.values():
-		demo_ship_blocks.append(tuple(demo_ship.position))
-	if up in demo_ship_blocks:
-		to_ret += 1
-		db.append(up)
-	if down in demo_ship_blocks:
-		to_ret += 1
-		db.append(down)
-	if left in demo_ship_blocks:
-		to_ret += 1
-		db.append(left)
-	if right in demo_ship_blocks:
-		to_ret += 1
-		db.append(right)
-	return to_ret
 
 def off_edge(db, ship, grid):
 	"""
