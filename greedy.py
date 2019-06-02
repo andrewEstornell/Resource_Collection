@@ -51,7 +51,7 @@ def greedy_decision(grid, action_dict, it):
 			move = greedy_move(grid, ship)
 
 			# if all blocks in surounding radius are 0, expand the radius that the greedy searches
-			if grid.grid[move[0]][move[1]].resources == 0:
+			if grid.grid[ship.position[0] + move[0]][ship.position[1] + move[1]].resources == 0:
 				global radius
 				radius = min(radius * 2, 2)
 			move_to_make = move
