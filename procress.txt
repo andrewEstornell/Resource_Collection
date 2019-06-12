@@ -1,0 +1,30 @@
+Minimax at each depth play all possible moves,
+once we reach max death. Call heuristic eval on current state of board- feature
+extraction, put through neural network, outputs real number, and then propagates
+up the tree.
+
+
+Game n is being played:
+  1. minimax creates tree
+  2. if it reaches max depth
+    3. call heuristic evaluation on current state of board and give a real number
+    4. when real number is returned and that value propagates up
+    5. make move from that number
+Put game n through fitness function and return fitness score
+
+
+*                                                             *
+Reinforcement learning vs. active learning is under unsupervised learning
+-active- has an idea how it thinks and learns more about world
+-Reinforcement- agent is learning how to learn
+*                                                             *
+
+
+John-
+Heuristic Evaluation:
+  Forward propagation
+  Feature extraction
+
+Andrew-
+Minimax
+Population updating

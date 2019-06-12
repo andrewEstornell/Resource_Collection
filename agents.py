@@ -35,6 +35,11 @@ class SingleGeneticAI:
 			self.fitness = gird.total_collection
 			return self.fitness
 
+		def heuristic_eval(self, state):
+			features = self.extract_features(state)
+			eval = self.forward_pass(features)
+			return eval
+
 		def forward_pass(self, features):
 			"""
 				Performs a forward pass of the network, the end result is an action for the agent
@@ -47,6 +52,9 @@ class SingleGeneticAI:
 			output = input_to_next_layer
 			return output
 
+		def extract_features(self, state):
+			pass
+		
 	def __init__(self, input_size, seed, max_depth, max_nodes, output_size, population_size, mutate_prob):
 		"""
 
