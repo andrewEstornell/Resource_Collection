@@ -30,6 +30,13 @@ class SingleGeneticAI:
 			self.brain = [np.zeros([m, input_size]), np.zeros([output_size, m])] # This should be a list of numpy arrays, each 2D array is a layer of the brain
 			self.portion_of_board = portion_of_board
 
+	 	@staticmethod
+	 	def in_bounds(i, j, size):
+			return i >= 0 and i < size and j >= 0 and j < size
+ 
+		@staticmethod
+		def sigmoid(arr):
+			return 1/(1+np.exp(-arr))
 
 		def play_game(self, gird):
 			"""
@@ -96,16 +103,6 @@ class SingleGeneticAI:
 						self.input[ind] = float(board.grid[i][j].resources/board.max_resources) #feature scaling
 					ind += 1
 
-		@staticmethod
-		def in_bounds(i, j, size):
-			return i >= 0 and i < size and j >= 0 and j < size
-
-		@staticmethod
-		def sigmoid(arr):
-			return 1/(1+np.exp(-arr))
-			
-			
-		    
 
 	def __init__(self, input_size, seed, max_depth, max_nodes, output_size, population_size, mutate_prob):
 		"""
