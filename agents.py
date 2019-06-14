@@ -1,6 +1,8 @@
 from grid import *
 import numpy as np
 
+ENEMY = -10
+FRIENDLY = -1
 
 class SingleGeneticAI:
 	"""
@@ -11,7 +13,7 @@ class SingleGeneticAI:
 
 	class Brain:
 
-		def __init__(self, input_size, seed, max_depth, max_nodes, output_size):
+		def __init__(self, input_size, seed, max_depth, max_nodes, output_size, portion_of_board):
 			"""
 			 Creates a neural network
 			:param input_size:
@@ -19,10 +21,13 @@ class SingleGeneticAI:
 			:param max_depth:
 			:param max_nodes:
 			:param output_size:
+			:param radius:
 			"""
+
 			self.input = np.zeros([input_size, 1])
 			self.fitness = 0
 			self.brain = [np.zeros(1)] # This should be a list of numpy arrays, each 2D array is a layer of the brain
+			self.portion_of_board = portion_of_board
 
 
 		def play_game(self, gird):
@@ -36,28 +41,54 @@ class SingleGeneticAI:
 			return self.fitness
 
 		def heuristic_eval(self, state):
-			features = self.extract_features(state)
+			"""
+			:param state: GRID
+			:return:
+			"""
+			board = state[0]
+			piece = state[1]
+
+			features = self.extract_features(board, piece)
 			eval = self.forward_pass(features)
 			return eval
 
 		def forward_pass(self, features):
 			"""
-				Performs a forward pass of the network, the end result is an action for the agent
-			:param features: input from the agent the AI is controlling
-			:return: index of the action that the agent should make
+				Performs a forward pass of the network, the end result is a real number
+			:param features: LIST, input from the agent the AI is controlling
+			:return: FLOAT
 			"""
+
 			input_to_next_layer = features
 			for layer in self.brain:
 				input_to_next_layer = layer*input_to_next_layer
 			output = input_to_next_layer
 			return output
 
-		def extract_features(self, state):
-			pass
-		
+		def extract_features(self, board, piece):
+			"""
+			:param state: GRID, this is the grid that the game is played on
+			:return: LIST, returns a list of features that will be forward propagated through the neural network
+			"""
+			demo_ship_cells = []
+			for vals in board.demo_ships.valus():
+				demo_ship_cells.append(tuple(vals))
+
+			features = {}
+			n = self.portion_of_board*board.size
+
+			for i in range(piece.position[0]-n, piece.position[0]+n+1):
+				for j in range(piece.position[1]-n, piece.position[1]+n+1):
+					if (i,j) in demo_ship_cells:
+						features[(i,j)] = ENEMY
+					elif board.grid[i][j].ship:
+						features[(i,j)] = FRIENDLY
+					else:
+						features[(i,j)] = float(board.grid[i][j].resources/board.max_resources) #feature scaling
+			#TODO extract those features to a vector that makes sense
+
 	def __init__(self, input_size, seed, max_depth, max_nodes, output_size, population_size, mutate_prob):
 		"""
-
 		:param input_size: length of the feature vector
 		:param seed: seed for random library
 		:param max_depth: max number of hidden layers
@@ -74,6 +105,7 @@ class SingleGeneticAI:
 			Plays the game for each brain and calculates the fitness
 		:return: None
 		"""
+
 		for brain in self.population:
 			grid = Grid() # fill in
 			brain.play_game(grid)
@@ -94,6 +126,7 @@ class SingleGeneticAI:
 			spawns 50% more random brains
 		:return:
 		"""
+
 		self.calc_fitness()
 		brains_sorted_by_fitenss = sorted([(brain.fitness, brain) for brain in self.population], key=lambda x: x[0])
 
