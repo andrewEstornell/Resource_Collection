@@ -1,8 +1,8 @@
 from grid import *
 import numpy as np
 
-ENEMY = -10
-FRIENDLY = -1
+ENEMY = -1
+FRIENDLY = -.1
 
 class SingleGeneticAI:
 	"""
@@ -65,27 +65,38 @@ class SingleGeneticAI:
 			output = input_to_next_layer
 			return output
 
+		@staticmethod
+		def in_bounds(i, j, size):
+			return i >= 0 and i < size and j >= 0 and j < size
+
 		def extract_features(self, board, piece):
 			"""
+				scans a portion of the board surrounding the piece and extracts features for each cell
 			:param state: GRID, this is the grid that the game is played on
 			:return: LIST, returns a list of features that will be forward propagated through the neural network
 			"""
-			demo_ship_cells = []
+			enemy_cells = []
 			for vals in board.demo_ships.valus():
-				demo_ship_cells.append(tuple(vals))
+				enemy_cells.append(tuple(vals))
 
-			features = {}
 			n = self.portion_of_board*board.size
+			features = np.zeros([n*n, 1])
+			ind = 0
 
 			for i in range(piece.position[0]-n, piece.position[0]+n+1):
 				for j in range(piece.position[1]-n, piece.position[1]+n+1):
-					if (i,j) in demo_ship_cells:
-						features[(i,j)] = ENEMY
-					elif board.grid[i][j].ship:
-						features[(i,j)] = FRIENDLY
-					else:
-						features[(i,j)] = float(board.grid[i][j].resources/board.max_resources) #feature scaling
-			#TODO extract those features to a vector that makes sense
+					if (i,j) in enemy_cells: #if enemy
+						features[ind] = ENEMY
+					elif board.grid[i][j].ship and (i,j) != piece.position: #if friendly ship
+						features[ind] = FRIENDLY
+					elif not in_bounds(i, j, board.size): #if out of bound cell
+						features[ind] = ENEMY
+					else: #if it is a resource block
+						features[ind] = float(board.grid[i][j].resources/board.max_resources) #feature scaling
+					ind += 1
+
+			return features
+
 
 	def __init__(self, input_size, seed, max_depth, max_nodes, output_size, population_size, mutate_prob):
 		"""
