@@ -23,10 +23,10 @@ class SingleGeneticAI:
 			:param output_size:
 			:param radius:
 			"""
-
+			m = input_size/2 #number of neurons in 1st hidden layer
 			self.input = np.zeros([input_size, 1])
 			self.fitness = 0
-			self.brain = [np.zeros(1)] # This should be a list of numpy arrays, each 2D array is a layer of the brain
+			self.brain = [np.zeros([m, input_size]), np.zeros([output_size, m])] # This should be a list of numpy arrays, each 2D array is a layer of the brain
 			self.portion_of_board = portion_of_board
 
 
@@ -48,8 +48,8 @@ class SingleGeneticAI:
 			board = state[0]
 			piece = state[1]
 
-			features = self.extract_features(board, piece)
-			eval = self.forward_pass(features)
+			self.extract_features(board, piece)
+			eval = self.forward_pass(self.input)
 			return eval
 
 		def forward_pass(self, features):
@@ -61,7 +61,7 @@ class SingleGeneticAI:
 
 			input_to_next_layer = features
 			for layer in self.brain:
-				input_to_next_layer = layer*input_to_next_layer
+				input_to_next_layer = np.dot(layer, input_to_next_layer)
 			output = input_to_next_layer
 			return output
 
@@ -79,24 +79,19 @@ class SingleGeneticAI:
 			for vals in board.demo_ships.valus():
 				enemy_cells.append(tuple(vals))
 
-			n = self.portion_of_board*board.size
-			features = np.zeros([n*n, 1])
 			ind = 0
 
 			for i in range(piece.position[0]-n, piece.position[0]+n+1):
 				for j in range(piece.position[1]-n, piece.position[1]+n+1):
 					if (i,j) in enemy_cells: #if enemy
-						features[ind] = ENEMY
+						self.input[ind] = ENEMY
 					elif board.grid[i][j].ship and (i,j) != piece.position: #if friendly ship
-						features[ind] = FRIENDLY
+						self.input[ind] = FRIENDLY
 					elif not in_bounds(i, j, board.size): #if out of bound cell
-						features[ind] = ENEMY
+						self.input[ind] = ENEMY
 					else: #if it is a resource block
-						features[ind] = float(board.grid[i][j].resources/board.max_resources) #feature scaling
+						self.input[ind] = float(board.grid[i][j].resources/board.max_resources) #feature scaling
 					ind += 1
-
-			return features
-
 
 	def __init__(self, input_size, seed, max_depth, max_nodes, output_size, population_size, mutate_prob):
 		"""
