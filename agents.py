@@ -65,7 +65,10 @@ class SingleGeneticAI:
 			for layer in self.brain:
 				input_to_next_layer = np.dot(layer, input_to_next_layer) + self.bias[i]
 				i+=1
-			output = input_to_next_layer
+				if i < len(self.brain):
+					input_to_next_layer = np.tanh(input_to_next_layer)
+
+			output = sigmoid(input_to_next_layer)
 			return output
 
 		def extract_features(self, board, piece):
@@ -93,9 +96,15 @@ class SingleGeneticAI:
 						self.input[ind] = float(board.grid[i][j].resources/board.max_resources) #feature scaling
 					ind += 1
 
-		 @staticmethod
-		 def in_bounds(i, j, size):
+		@staticmethod
+		def in_bounds(i, j, size):
 			return i >= 0 and i < size and j >= 0 and j < size
+
+		@staticmethod
+		def sigmoid(arr):
+			return 1/(1+np.exp(-arr))
+			
+			
 		    
 
 	def __init__(self, input_size, seed, max_depth, max_nodes, output_size, population_size, mutate_prob):
