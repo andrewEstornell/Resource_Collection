@@ -24,6 +24,7 @@ class SingleGeneticAI:
 			:param radius:
 			"""
 			m = input_size/2 #number of neurons in 1st hidden layer
+			self.bias = [np.zeros(m,1), np.zeros(1,1)]
 			self.input = np.zeros([input_size, 1])
 			self.fitness = 0
 			self.brain = [np.zeros([m, input_size]), np.zeros([output_size, m])] # This should be a list of numpy arrays, each 2D array is a layer of the brain
@@ -60,14 +61,12 @@ class SingleGeneticAI:
 			"""
 
 			input_to_next_layer = features
+			i = 0
 			for layer in self.brain:
-				input_to_next_layer = np.dot(layer, input_to_next_layer)
+				input_to_next_layer = np.dot(layer, input_to_next_layer) + self.bias[i]
+				i+=1
 			output = input_to_next_layer
 			return output
-
-		@staticmethod
-		def in_bounds(i, j, size):
-			return i >= 0 and i < size and j >= 0 and j < size
 
 		def extract_features(self, board, piece):
 			"""
@@ -75,6 +74,7 @@ class SingleGeneticAI:
 			:param state: GRID, this is the grid that the game is played on
 			:return: LIST, returns a list of features that will be forward propagated through the neural network
 			"""
+			n = board.size*self.portion_of_board
 			enemy_cells = []
 			for vals in board.demo_ships.valus():
 				enemy_cells.append(tuple(vals))
@@ -92,6 +92,11 @@ class SingleGeneticAI:
 					else: #if it is a resource block
 						self.input[ind] = float(board.grid[i][j].resources/board.max_resources) #feature scaling
 					ind += 1
+
+		 @staticmethod
+		 def in_bounds(i, j, size):
+			return i >= 0 and i < size and j >= 0 and j < size
+		    
 
 	def __init__(self, input_size, seed, max_depth, max_nodes, output_size, population_size, mutate_prob):
 		"""

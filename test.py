@@ -1,3 +1,9 @@
-import random as rand
+def foo():
+    print("hello")
+    bar()
 
-print(int(rand.uniform(0, 1) > 0.5))
+
+
+def bar():
+    print("world.")
+
