@@ -111,7 +111,7 @@ class Cell:
 class Grid:
 
     def __init__(self, size, seed, max_resources, spawning_cost, starting_point, ship_capacity, percent_pickup, sparsity,
-                 demo_ship_turn):
+                 demo_ship_turn, max_iterations=300):
         """
 
         :param size: INT, grid will be size*size
@@ -127,11 +127,11 @@ class Grid:
         self.max_resources = max_resources
         self.size = size
         self.spawning_cost = spawning_cost
+        self.is_game_over = False
+        self.max_iterations = max_iterations
 
         self.grid = [[Cell(resources=int(rand.uniform(0, 1) > sparsity)*rand.randint(0, max_resources), obstruction=False) for j in range(size)]
                                                                                         for i in range(size)]
-
-
 
         self.percent_pickup = percent_pickup
         self.starting_point = starting_point
@@ -183,6 +183,9 @@ class Grid:
         drop_off_ids = self.drop_offs.keys()#not sure
 
         #id is the key and the action (tuple)
+        if self.is_game_over is True:
+            print("action attemped to be performed in a game that has ended, error code : -5")
+            exit(-5)
         for id, ac in action_dict.items():
         
             # Validates id of the ship
@@ -197,6 +200,7 @@ class Grid:
                     else:#not enough resources to spawn the new ship
                         print("the action SPAWN was given but it cost", self.spawning_cost,
                               "while the total_collection was only", self.total_collection)
+                        print("error code -4")
                         exit(-4)
                         
             elif id not in ship_ids: #a ship was given an action to perform but was not actually in the remaining ships
@@ -259,7 +263,7 @@ class Grid:
         if self.total_resources == 0:
             print("Game Over. No more Resources")
             print("Score: ", self.total_collection)
-            exit(1)
+            self.is_game_over = True
 
         # Performs demo ship actions on even rounds
         if self.iteration % demo_ship_spawn_rate == 0 and self.iteration != 0:
@@ -280,6 +284,8 @@ class Grid:
                 if len(list(self.ships.values())) == 0:
                     print("Game Over. Demo ship destroyed last cargo ship")
                     print("Score: ", self.total_collection)
-                    exit(1)
+                    self.is_game_over = True
         self.iteration += 1
+        if self.iteration >= self.max_iterations:
+            self.is_game_over = True
 

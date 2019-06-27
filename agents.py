@@ -30,23 +30,58 @@ class SingleGeneticAI:
 			self.brain = [np.zeros([m, input_size]), np.zeros([output_size, m])] # This should be a list of numpy arrays, each 2D array is a layer of the brain
 			self.portion_of_board = portion_of_board
 
-	 	@staticmethod
-	 	def in_bounds(i, j, size):
-			return i >= 0 and i < size and j >= 0 and j < size
+		@staticmethod
+		def in_bounds(i, j, size):
+			return 0 <= i < size and 0 <= j < size
  
 		@staticmethod
 		def sigmoid(arr):
 			return 1/(1+np.exp(-arr))
 
-		def play_game(self, gird):
+		def play_game(self, grid, depth):
 			"""
 				Plays through a game given by grid,
-			:param gird: object containing the resource collection game
+			:param grid: object containing the resource collection game
 			:return: the score of the game (fitness of the brain)
 			"""
-
-			self.fitness = gird.total_collection
+			while not grid.is_game_over:
+				action_dict = {}
+				for ship in grid.ships.values():
+					action_dict[ship.id] = self.minimax(grid, ship.id, depth)
+			self.fitness = grid.total_collection
 			return self.fitness
+
+		def minimax(self, grid, id, depth):
+			ship = grid.ships[id]
+			moves = [(ship.position[0] + action[0], ship.position[1] + action[1]) for action in actions
+					 	if self.in_bounds(ship.position[0] + action[0], ship.position[1] + action[1], grid.size)]
+			best_move = None
+			best_value = float("-inf")
+			for move in moves:
+				value = self.maxi(grid, id, depth)
+				if value >= best_value:
+					best_value = value
+					best_move = move
+			return best_move
+
+		def maxi(self, grid, id, depth):
+			if depth <= 0:
+				return self.heuristic_eval(grid)
+			elif grid.is_game_over is True:
+				return grid.total_collection
+
+			ship = grid.ships[id]
+			moves = [(ship.position[0] + action[0], ship.position[1] + action[1]) for action in actions
+					 if self.in_bounds(ship.position[0] + action[0], ship.position[1] + action[1], grid.size)]
+			best_value = float("-inf")
+			for move in moves:
+				new_grid = copy.deepcopy(grid)
+				action_dict = {id: move}
+				grid.perform_actions(action_dict)
+				value = self.maxi(new_grid, id, depth - 1)
+				if value > best_value:
+					best_value = value
+			return best_value
 
 		def heuristic_eval(self, state):
 			"""
@@ -75,7 +110,7 @@ class SingleGeneticAI:
 				if i < len(self.brain):
 					input_to_next_layer = np.tanh(input_to_next_layer)
 
-			output = sigmoid(input_to_next_layer)
+			output = self.sigmoid(input_to_next_layer)
 			return output
 
 		def extract_features(self, board, piece):
@@ -97,12 +132,11 @@ class SingleGeneticAI:
 						self.input[ind] = ENEMY
 					elif board.grid[i][j].ship and (i,j) != piece.position: #if friendly ship
 						self.input[ind] = FRIENDLY
-					elif not in_bounds(i, j, board.size): #if out of bound cell
+					elif not self.in_bounds(i, j, board.size): #if out of bound cell
 						self.input[ind] = ENEMY
 					else: #if it is a resource block
 						self.input[ind] = float(board.grid[i][j].resources/board.max_resources) #feature scaling
 					ind += 1
-
 
 	def __init__(self, input_size, seed, max_depth, max_nodes, output_size, population_size, mutate_prob):
 		"""
@@ -117,15 +151,16 @@ class SingleGeneticAI:
 		self.population = [self.Brain(input_size, seed, max_depth, max_nodes, output_size) for _ in range(population_size)]
 		self.mutate_prob = mutate_prob
 
-	def calc_fitness(self):
+	def calc_fitness(self, base_grid):
 		"""
 			Plays the game for each brain and calculates the fitness
 		:return: None
 		"""
 
 		for brain in self.population:
-			grid = Grid() # fill in
-			brain.play_game(grid)
+			grid = copy.deepcopy(base_grid)
+			brain.fitness = brain.play_game(grid)
+
 
 	def spawn_with_mutations(self, brain):
 		new_brain = copy.deepcopy(brain)
@@ -136,7 +171,7 @@ class SingleGeneticAI:
 						layer[i][j] += layer[i][j]*rand.uniform(-1, 1)
 		return new_brain
 
-	def spawn_next_generation(self):
+	def spawn_next_generation(self, base_grid):
 		"""
 			Runs the fitness of the brains
 			Takes the top 25% and reproduces them
@@ -144,15 +179,16 @@ class SingleGeneticAI:
 		:return:
 		"""
 
-		self.calc_fitness()
+		self.calc_fitness(base_grid)
 		brains_sorted_by_fitenss = sorted([(brain.fitness, brain) for brain in self.population], key=lambda x: x[0])
+		top_50 = [brain[1] for brain in brains_sorted_by_fitenss][:len(brains_sorted_by_fitenss)//2]
 
-		# Make mutations
+		next_generation = []
+		for brain in top_50:
+			next_generation.append(self.spawn_with_mutations(brain))
+			next_generation.append(self.spawn_with_mutations(brain))
 
-		# Spawn 50% more
-
-
-
+		return next_generation
 
 
 
