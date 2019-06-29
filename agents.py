@@ -23,11 +23,18 @@ class SingleGeneticAI:
 			:param output_size:
 			:param radius:
 			"""
+			rand.seed(seed)
 			m = input_size/2 #number of neurons in 1st hidden layer
 			self.bias = [np.zeros(m,1), np.zeros(1,1)]
 			self.input = np.zeros([input_size, 1])
 			self.fitness = 0
 			self.brain = [np.zeros([m, input_size]), np.zeros([output_size, m])] # This should be a list of numpy arrays, each 2D array is a layer of the brain
+			for layer in self.brain:
+				for i in range(len(layer)):
+					for j in range(len(layer[0])):
+						layer[i][j] = rand.uniform(-1, 1)
+
+
 			self.portion_of_board = portion_of_board
 
 		@staticmethod
