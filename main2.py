@@ -2,7 +2,7 @@ from agents import *
 from gui import *
 from grid import *
 
-MAX_GENERATIONS = 500
+MAX_GENERATIONS = 1
 
 size = 10
 seed = 25

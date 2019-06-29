@@ -25,8 +25,9 @@ class SingleGeneticAI:
 			:param radius:
 			"""
 			rand.seed(seed)
-			m = input_size/2 #number of neurons in 1st hidden layer
-			self.bias = [np.zeros(m,1), np.zeros(1,1)]
+			m = input_size//2 #number of neurons in 1st hidden layer
+			self.input_size = input_size
+			self.bias = [np.zeros([m,1]), np.zeros([1,1])]
 			self.input = np.zeros([input_size, 1])
 			self.fitness = 0
 			self.brain = [np.zeros([m, input_size]), np.zeros([output_size, m])] # This should be a list of numpy arrays, each 2D array is a layer of the brain
@@ -35,8 +36,6 @@ class SingleGeneticAI:
 					for j in range(len(layer[0])):
 						layer[i][j] = rand.uniform(-1, 1)
 
-
-			self.portion_of_board = portion_of_board
 
 		@staticmethod
 		def in_bounds(i, j, size):
@@ -70,7 +69,7 @@ class SingleGeneticAI:
 				if value >= best_value:
 					best_value = value
 					best_move = move
-			return best_move
+			return (abs(best_move[0] - ship.position[0]), abs(best_move[1] - ship.position[1]))
 
 		def maxi(self, grid, id, depth):
 			if depth <= 0:
@@ -81,10 +80,14 @@ class SingleGeneticAI:
 			ship = grid.ships[id]
 			moves = [(ship.position[0] + action[0], ship.position[1] + action[1]) for action in actions
 					 if self.in_bounds(ship.position[0] + action[0], ship.position[1] + action[1], grid.size)]
+
 			best_value = float("-inf")
 			for move in moves:
 				new_grid = copy.deepcopy(grid)
-				action_dict = {id: move}
+				valid_move = (abs(move[0] - ship.position[0]), abs(move[1] - ship.position[1]))
+				action_dict = {id: valid_move}
+				print("Pos",ship.position)
+				print("move",move)
 				grid.perform_actions(action_dict)
 				value = self.maxi(new_grid, id, depth - 1)
 				if value > best_value:
@@ -127,10 +130,10 @@ class SingleGeneticAI:
 			:param state: GRID, this is the grid that the game is played on
 			:return: LIST, returns a list of features that will be forward propagated through the neural network
 			"""
-			n = math.sqrt(self.input_size)
+			n = int(math.sqrt(self.input_size)//2)
 			enemy_cells = []
-			for vals in board.demo_ships.valus():
-				enemy_cells.append(tuple(vals))
+			for vals in board.demo_ships.values():
+				enemy_cells.append(tuple(vals.position))
 
 			ind = 0
 
