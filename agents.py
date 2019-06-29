@@ -60,7 +60,7 @@ class SingleGeneticAI:
 
 		def minimax(self, grid, id, depth):
 			ship = grid.ships[id]
-			moves = [(ship.position[0] + action[0], ship.position[1] + action[1]) for action in actions
+			moves = [(action[0], action[1]) for action in actions
 					 	if self.in_bounds(ship.position[0] + action[0], ship.position[1] + action[1], grid.size)]
 			best_move = None
 			best_value = float("-inf")
@@ -69,7 +69,7 @@ class SingleGeneticAI:
 				if value >= best_value:
 					best_value = value
 					best_move = move
-			return (abs(best_move[0] - ship.position[0]), abs(best_move[1] - ship.position[1]))
+			return best_move
 
 		def maxi(self, grid, id, depth):
 			if depth <= 0:
@@ -78,16 +78,13 @@ class SingleGeneticAI:
 				return grid.total_collection
 
 			ship = grid.ships[id]
-			moves = [(ship.position[0] + action[0], ship.position[1] + action[1]) for action in actions
+			moves = [(action[0], action[1]) for action in actions
 					 if self.in_bounds(ship.position[0] + action[0], ship.position[1] + action[1], grid.size)]
 
 			best_value = float("-inf")
 			for move in moves:
 				new_grid = copy.deepcopy(grid)
-				valid_move = (abs(move[0] - ship.position[0]), abs(move[1] - ship.position[1]))
-				action_dict = {id: valid_move}
-				print("Pos",ship.position)
-				print("move",move)
+				action_dict = {id: move}
 				grid.perform_actions(action_dict)
 				value = self.maxi(new_grid, id, depth - 1)
 				if value > best_value:

@@ -2,10 +2,10 @@ from agents import *
 from gui import *
 from grid import *
 
-MAX_GENERATIONS = 1
+MAX_GENERATIONS = 20
 
 size = 10
-seed = 25
+seed = 1
 spawning_cost = 2000
 max_resources = 400
 starting_point = ((size - 1) // 2, (size - 1) // 2)
