@@ -1,5 +1,6 @@
 from grid import *
 import numpy as np
+import math
 
 ENEMY = -1
 FRIENDLY = -.1
@@ -13,7 +14,7 @@ class SingleGeneticAI:
 
 	class Brain:
 
-		def __init__(self, input_size, seed, max_depth, max_nodes, output_size, portion_of_board):
+		def __init__(self, input_size, seed, max_depth, max_nodes, output_size):
 			"""
 			 Creates a neural network
 			:param input_size:
@@ -73,7 +74,7 @@ class SingleGeneticAI:
 
 		def maxi(self, grid, id, depth):
 			if depth <= 0:
-				return self.heuristic_eval(grid)
+				return self.heuristic_eval(grid, id)
 			elif grid.is_game_over is True:
 				return grid.total_collection
 
@@ -90,13 +91,13 @@ class SingleGeneticAI:
 					best_value = value
 			return best_value
 
-		def heuristic_eval(self, state):
+		def heuristic_eval(self, state, id):
 			"""
 			:param state: GRID
 			:return:
 			"""
-			board = state[0]
-			piece = state[1]
+			board = state
+			piece = state.ships[id]
 
 			self.extract_features(board, piece)
 			eval = self.forward_pass(self.input)
@@ -126,7 +127,7 @@ class SingleGeneticAI:
 			:param state: GRID, this is the grid that the game is played on
 			:return: LIST, returns a list of features that will be forward propagated through the neural network
 			"""
-			n = board.size*self.portion_of_board
+			n = math.sqrt(self.input_size)
 			enemy_cells = []
 			for vals in board.demo_ships.valus():
 				enemy_cells.append(tuple(vals))
@@ -155,6 +156,7 @@ class SingleGeneticAI:
 		"""
 
 		# Collection of brains
+		self.max_depth = max_depth
 		self.population = [self.Brain(input_size, seed, max_depth, max_nodes, output_size) for _ in range(population_size)]
 		self.mutate_prob = mutate_prob
 
@@ -166,7 +168,7 @@ class SingleGeneticAI:
 
 		for brain in self.population:
 			grid = copy.deepcopy(base_grid)
-			brain.fitness = brain.play_game(grid)
+			brain.fitness = brain.play_game(grid, self.max_depth)
 
 
 	def spawn_with_mutations(self, brain):
