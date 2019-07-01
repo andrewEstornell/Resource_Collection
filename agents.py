@@ -177,7 +177,7 @@ class SingleGeneticAI:
 			for i in range(len(layer)):
 				for j in range(len(layer[i])):
 					if rand.uniform(0, 1) > self.mutate_prob:
-						layer[i][j] += layer[i][j]*rand.uniform(-1, 1)
+						layer[i][j] += layer[i][j]*rand.uniform(-.5, .5)
 		return new_brain
 
 	def spawn_next_generation(self, base_grid):
