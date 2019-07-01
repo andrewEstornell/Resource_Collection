@@ -55,6 +55,7 @@ class SingleGeneticAI:
 				action_dict = {}
 				for ship in grid.ships.values():
 					action_dict[ship.id] = self.minimax(grid, ship.id, depth)
+					grid.perform_actions(action_dict)
 			self.fitness = grid.total_collection
 			return self.fitness
 
@@ -80,7 +81,6 @@ class SingleGeneticAI:
 			ship = grid.ships[id]
 			moves = [(action[0], action[1]) for action in actions
 					 if self.in_bounds(ship.position[0] + action[0], ship.position[1] + action[1], grid.size)]
-
 			best_value = float("-inf")
 			for move in moves:
 				new_grid = copy.deepcopy(grid)
