@@ -24,13 +24,14 @@ class SingleGeneticAI:
 			:param output_size:
 			:param radius:
 			"""
-			rand.seed(seed)
-			m = input_size//2 #number of neurons in 1st hidden layer
+			self.seed = seed
+			rand.seed(self.seed)
+			self.hidden_layer_size = input_size//2 #number of neurons in 1st hidden layer
 			self.input_size = input_size
 			self.bias = [np.zeros([m,1]), np.zeros([1,1])]
 			self.input = np.zeros([input_size, 1])
 			self.fitness = 0
-			self.brain = [np.zeros([m, input_size]), np.zeros([output_size, m])] # This should be a list of numpy arrays, each 2D array is a layer of the brain
+			self.brain = [np.zeros([self.hidden_layer_size, input_size]), np.zeros([output_size, self.hidden_layer_size])] # This should be a list of numpy arrays, each 2D array is a layer of the brain
 			for layer in self.brain:
 				for i in range(len(layer)):
 					for j in range(len(layer[0])):
@@ -171,7 +172,7 @@ class SingleGeneticAI:
 			brain.fitness = brain.play_game(grid, self.max_depth)
 
 
-	def spawn_with_mutations(self, brain):
+	def spawn_with_mutations_asexual(self, brain):
 		new_brain = copy.deepcopy(brain)
 		for layer in new_brain.brain:
 			for i in range(len(layer)):
@@ -179,6 +180,27 @@ class SingleGeneticAI:
 					if rand.uniform(0, 1) > self.mutate_prob:
 						layer[i][j] += layer[i][j]*rand.uniform(-.5, .5)
 		return new_brain
+
+	def span_with_mutation_sexual(self, brain1, brain2):
+		new_brain = copy.deepcopy(brain1)
+		b1 = brain1.brain
+		b2 = brain2.brain
+		for i in len(b1):
+			for j in len(b1[i]):
+				for k in len(b1[i][j]):
+					new_brain.brain[i][j][k] = (b1[j][k] * b2[j][k])/2
+					if rand.uniform(0, 1) > self.mutate_prob:
+						new_brain.brain[i][j][k] += rand.uniform(-.5, .5)
+		b1 = brain1.bias
+		b2 = brain2.bias
+		for i in len(b1):
+			for j in len(b1[i]):
+				new_brain.bias[i][j] = (b1[j] * b2[j]) / 2
+				if rand.uniform(0, 1) > self.mutate_prob:
+					new_brain.bias[i][j] += rand.uniform(-.5, .5)
+
+		return new_brain
+
 
 	def spawn_next_generation(self, base_grid):
 		"""
@@ -193,9 +215,16 @@ class SingleGeneticAI:
 		top_50 = [brain[1] for brain in brains_sorted_by_fitenss][:len(brains_sorted_by_fitenss)//2]
 
 		next_generation = []
+		"""ASEXUAL REPRODUCTION
 		for brain in top_50:
-			next_generation.append(self.spawn_with_mutations(brain))
-			next_generation.append(self.spawn_with_mutations(brain))
+			next_generation.append(self.spawn_with_mutations_asexual(brain))
+			next_generation.append(self.spawn_with_mutations_asexual(brain))
+		"""
+		#SEXUAL REPRODUCTION
+		for i in range(len(top_50)//2):
+			next_generation.append(self.spawn_with_mutations_sexual(top_50[i], top_50[len(top_50)-i-1]))
+			next_generation.append(self.spawn_with_mutations_sexual(top_50[i], top_50[len(top_50)-i-1]))
+
 
 		return next_generation
 
