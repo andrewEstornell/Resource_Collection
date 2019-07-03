@@ -183,6 +183,8 @@ class SingleGeneticAI:
 
 	def span_with_mutation_sexual(self, brain1, brain2):
 		new_brain = copy.deepcopy(brain1)
+
+		#weight reproduction
 		b1 = brain1.brain
 		b2 = brain2.brain
 		for i in len(b1):
@@ -191,6 +193,8 @@ class SingleGeneticAI:
 					new_brain.brain[i][j][k] = (b1[j][k] * b2[j][k])/2
 					if rand.uniform(0, 1) > self.mutate_prob:
 						new_brain.brain[i][j][k] += rand.uniform(-.5, .5)
+
+		#bias reproduction
 		b1 = brain1.bias
 		b2 = brain2.bias
 		for i in len(b1):
@@ -220,6 +224,9 @@ class SingleGeneticAI:
 			next_generation.append(self.spawn_with_mutations_asexual(brain))
 			next_generation.append(self.spawn_with_mutations_asexual(brain))
 		"""
+
+		if len(top_50%2):
+			next_generation.append(self.spawn_with_mutations_sexual(top_50[rand.randint(0, len(top_50))], top_50[rand.randint(0, len(top_50))]))
 		#SEXUAL REPRODUCTION
 		for i in range(len(top_50)//2):
 			next_generation.append(self.spawn_with_mutations_sexual(top_50[i], top_50[len(top_50)-i-1]))
