@@ -28,7 +28,7 @@ class SingleGeneticAI:
 			rand.seed(self.seed)
 			self.hidden_layer_size = input_size//2 #number of neurons in 1st hidden layer
 			self.input_size = input_size
-			self.bias = [np.zeros([m,1]), np.zeros([1,1])]
+			self.bias = [np.zeros([self.hidden_layer_size,1]), np.zeros([1,1])]
 			self.input = np.zeros([input_size, 1])
 			self.fitness = 0
 			self.brain = [np.zeros([self.hidden_layer_size, input_size]), np.zeros([output_size, self.hidden_layer_size])] # This should be a list of numpy arrays, each 2D array is a layer of the brain

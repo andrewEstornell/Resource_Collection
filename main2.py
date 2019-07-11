@@ -18,6 +18,8 @@ gui_scale = 18
 grid = Grid(size, seed, max_resources, spawning_cost, starting_point, ship_capacity, percent_pickup, sparsity, 5)
 gui = GUI(grid, gui_scale)
 
+#test for git purposes
+
 if __name__=='__main__':
     it = 0
     genetic_ai = SingleGeneticAI(25, 1, 3, 50, 1, 100, .5)
