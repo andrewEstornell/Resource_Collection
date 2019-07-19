@@ -1,7 +1,7 @@
 from agents import *
 from gui import *
 from grid import *
-
+import pickle
 MAX_GENERATIONS = 20
 
 size = 10
@@ -18,6 +18,7 @@ gui_scale = 18
 grid = Grid(size, seed, max_resources, spawning_cost, starting_point, ship_capacity, percent_pickup, sparsity, 5)
 gui = GUI(grid, gui_scale)
 
+LOAD = False #should we load brains
 #test for git purposes
 
 if __name__=='__main__':
@@ -27,3 +28,8 @@ if __name__=='__main__':
         genetic_ai.calc_fitness(grid)
         genetic_ai.spawn_next_generation(grid)
         it+=1
+
+    #saving output
+    with open('geneticAI.obj', 'wb') as output:
+        pickle.dump(genetic_ai, output)
+
