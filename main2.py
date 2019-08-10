@@ -20,16 +20,23 @@ gui = GUI(grid, gui_scale)
 
 LOAD = False #should we load brains
 #test for git purposes
-
+file_name = 'geneticAI.obj'
 if __name__=='__main__':
     it = 0
-    genetic_ai = SingleGeneticAI(25, 1, 3, 50, 1, 100, .5)
+
+    if (LOAD):
+        with open(file_name, 'rb') as input:
+            genetic_ai = pickle.load(input)
+    else:
+        genetic_ai = SingleGeneticAI(25, 1, 3, 50, 1, 100, .5)
+
+    #running AI
     while it < MAX_GENERATIONS:
         genetic_ai.calc_fitness(grid)
         genetic_ai.spawn_next_generation(grid)
         it+=1
 
     #saving output
-    with open('geneticAI.obj', 'wb') as output:
+    with open(file_name, 'wb') as output:
         pickle.dump(genetic_ai, output)
 
